@@ -7,24 +7,11 @@ def sum arr
 end
 
 def max_2_sum arr
-  len = arr.count
-  case len
-    when 0
-      0
-    when 1
-      arr[0]
-  else
-    arr.sort!
-    arr[-1] + arr[-2]
-  end
+  sum arr.max 2
 end
 
 def sum_to_n? arr, n
-  for i in 0...arr.count do
-    for j in i+1...arr.count do
-      return true if arr[i] + arr[j] == n
-    end
-  end
+  arr.combination(2) { |x, y| return true if x+y == n }
   false
 end
 
@@ -39,19 +26,31 @@ def starts_with_consonant? s
 end
 
 def binary_multiple_of_4? s
-  s == "0" || s =~ /^[01]*00$/
+  s =~ /^(0|[01]*00)$/
 end
 
 # Part 3
 
 class BookInStock
-  attr_accessor :isbn, :price
-  def initialize(isbn_arg, price_arg)
-    throw ArgumentError if isbn_arg.empty? || price_arg <= 0
+  # It was pointed out in Pair Programming that the error should be raised if 
+  # anyone EVER wanted to input the wrong ISBN or price, not just at init time.
+  attr_reader :isbn, :price
+
+  def isbn= isbn_arg
+    throw ArgumentError, "Invalid ISBN #{isbn_arg}" if isbn_arg.empty?
     @isbn = isbn_arg
+  end
+  def price= price_arg
+    throw ArgumentError, "Invalid Price #{price_arg}" if price_arg <= 0
     @price = price_arg
   end
+  
+  def initialize(isbn_arg, price_arg)
+    self.isbn= isbn_arg # use the defined writers here (ugly I know)
+    self.price= price_arg
+  end
+  
   def price_as_string
-    sprintf "$%1.2f", @price
+    "$%1.2f" % @price # String#% works like sprintf
   end
 end
